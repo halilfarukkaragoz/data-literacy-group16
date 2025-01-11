@@ -55,8 +55,8 @@ def get_dataframes(conference_invitations: list[str]):
     for invitation in conference_invitations:
         if not get_invitation_path(invitation).exists():
             papers = list(query_openreview([invitation]))
-            _save_papers_to_cache(papers)
-        yield from _load_df_from_cache(invitation)
+            _save_papers_to_cache(invitation, papers)
+        yield _load_df_from_cache(invitation)
 
 
 def get_dataframes_concatd(conference_invitations: list[str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

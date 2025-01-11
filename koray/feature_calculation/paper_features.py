@@ -3,10 +3,13 @@ import re
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+
+tqdm.pandas()
 
 
 class FeatureExtractor:
-    def __init__(self, paper_df, review_df, other_replies_df):
+    def __init__(self, paper_df: pd.DataFrame, review_df: pd.DataFrame, other_replies_df: pd.DataFrame):
         self.paper_df = paper_df
         self.review_df = review_df
         self.other_replies_df = other_replies_df
@@ -21,7 +24,7 @@ class FeatureExtractor:
     def extract_features(self):
         """main function to extract features"""
         self.calculate_basic_features()
-        self.calculate_compex_features()
+        # self.calculate_compex_features()
 
     def calculate_basic_features(self):
         self.feature_df['title_length'] = self.paper_df['content'].apply(lambda x: len(x.get('title', '')))
@@ -31,7 +34,7 @@ class FeatureExtractor:
         self.feature_df['author_count'] = self.paper_df['content'].apply(lambda x: len(x.get('authors', [])))
         self.feature_df['keyword_count'] = self.paper_df['content'].apply(lambda x: len(x.get('keywords', [])))
 
-        self.feature_df = self.feature_df.merge(self._get_commitee_decision(), on='paper_id', how='left')
+        self.feature_df  = self.feature_df.merge(self._get_commitee_decision(), on='paper_id', how='left')
 
     def calculate_compex_features(self):
         self.feature_df = self.feature_df.merge(self.get_reviewer_features(), on='paper_id', how='left')
@@ -68,6 +71,7 @@ class FeatureExtractor:
         ).reset_index()
 
         decision_agg = decision_agg.rename(columns={'replyto': 'paper_id'})
+        assert decision_agg is not None
         return decision_agg
 
     def get_reviewer_features(self):
