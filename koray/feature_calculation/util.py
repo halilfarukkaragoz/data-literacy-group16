@@ -2,10 +2,11 @@ import pickle
 from pathlib import Path
 
 import pandas as pd
-from datastore.util import get_dataframes_concatd
-from feature_calculation.paper_features import FeatureExtractor
+from wasabi import msg
 
-from koray.const import FEAT_STORE
+from koray.datastore.util import get_dataframes_concatd
+from koray.feature_calculation.paper_features import FeatureExtractor
+from koray.util.const import FEAT_STORE
 
 
 def get_feature_path(invitation: str):
@@ -33,6 +34,7 @@ def get_features(conference_invitations):
 
         feature_df = pd.DataFrame(feature_df)
         yield feature_df
+    msg.good("Successfully calculated features")
 
 
 def get_features_concatd(conference_invitations):

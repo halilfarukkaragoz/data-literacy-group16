@@ -1,12 +1,12 @@
-
-
 import pickle
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pandas as pd
-from const import API_STORE
-from scrapers.scraper import get_paper_and_review_df, query_openreview
+from wasabi import msg
+
+from koray.scrapers.scraper import get_paper_and_review_df, query_openreview
+from koray.util.const import API_STORE
 
 if TYPE_CHECKING:
     import openreview.api
@@ -54,9 +54,11 @@ def _save_papers_to_cache(invitation: str, papers: list['openreview.api.Note']):
 def get_dataframes(conference_invitations: list[str]):
     for invitation in conference_invitations:
         if not get_invitation_path(invitation).exists():
+            msg.info(f"{invitation} is not in cache. Querying OpenReview API")
             papers = list(query_openreview([invitation]))
             _save_papers_to_cache(invitation, papers)
         yield _load_df_from_cache(invitation)
+    msg.good("Successfully loaded dataframes")
 
 
 def get_dataframes_concatd(conference_invitations: list[str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

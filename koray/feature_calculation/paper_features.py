@@ -1,9 +1,19 @@
 
 import re
+import warnings
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+
+try:
+    from tqdm import TqdmExperimentalWarning
+
+    # Remove experimental warning
+    warnings.filterwarnings("ignore", category=TqdmExperimentalWarning)
+    from tqdm.rich import tqdm
+except ImportError:
+    import tqdm
+
 
 tqdm.pandas()
 
@@ -34,7 +44,7 @@ class FeatureExtractor:
         self.feature_df['author_count'] = self.paper_df['content'].apply(lambda x: len(x.get('authors', [])))
         self.feature_df['keyword_count'] = self.paper_df['content'].apply(lambda x: len(x.get('keywords', [])))
 
-        self.feature_df  = self.feature_df.merge(self._get_commitee_decision(), on='paper_id', how='left')
+        self.feature_df = self.feature_df.merge(self._get_commitee_decision(), on='paper_id', how='left')
 
     def calculate_compex_features(self):
         self.feature_df = self.feature_df.merge(self.get_reviewer_features(), on='paper_id', how='left')
