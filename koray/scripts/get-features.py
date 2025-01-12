@@ -11,7 +11,7 @@ def main():
     ]
     
 
-    feature_df = list(get_features(conference_invitations))
+    feature_df = list(get_features(conference_invitations, disable_cache=True))
     print(feature_df)
     
 

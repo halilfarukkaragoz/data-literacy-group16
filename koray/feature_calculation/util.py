@@ -13,11 +13,13 @@ def get_feature_path(invitation: str):
     return FEAT_STORE / Path(invitation) / 'features.pkl'
 
 
-def get_features(conference_invitations):
-    for invitation in conference_invitations:
+def get_features(conference_invitations, disable_cache=False):
+    for idx, invitation in enumerate(conference_invitations):
         invitation_path = get_feature_path(invitation)
 
-        if not invitation_path.exists():
+        if not invitation_path.exists() or disable_cache:
+            print(f"Calculating features for {invitation} ({idx + 1}/{len(conference_invitations)})")
+            
             # calculate features
             paper_df, review_df, other_replies_df = get_dataframes_concatd([invitation])
             feature_extractor = FeatureExtractor(paper_df, review_df, other_replies_df)

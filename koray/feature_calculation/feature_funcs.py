@@ -9,7 +9,7 @@ import pandas as pd
 # the inputs are  papers' reviews and nonreviews. you can extract features from them.
 
 """
-def ff_your_feature_name(review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
+def ff_your_feature_name(review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
     # write your feature calculation here
 
     return 1234  # this will be the value in the feature_df
@@ -32,50 +32,51 @@ def _extract_numeric_prefix(maybe_string: object) -> int:
 # ----------------------------------
 
 
-def ff_title_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
-    return paper_df['content'].apply(lambda x: len(x.get('title', '')))
+class FeatureFunctions:
+    @staticmethod
+    def ff_title_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+        return paper_df['content'].apply(lambda x: len(x.get('title', '')))
 
+    @staticmethod
+    def ff_abstract_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+        return paper_df['content'].apply(lambda x: len(x.get('abstract', '')))
 
-def ff_abstract_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
-    return paper_df['content'].apply(lambda x: len(x.get('abstract', '')))
+    @staticmethod
+    def ff_tldr_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+        return paper_df['content'].apply(lambda x: len(x.get('TL;DR', '')))
 
+    @staticmethod
+    def ff_author_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+        return paper_df['content'].apply(lambda x: len(x.get('authors', [])))
 
-def ff_tldr_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
-    return paper_df['content'].apply(lambda x: len(x.get('TL;DR', '')))
+    @staticmethod
+    def ff_keyword_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+        return paper_df['content'].apply(lambda x: len(x.get('keywords', [])))
 
+    @staticmethod
+    def ff_is_accepted(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+        decision_note = other_replies_df[other_replies_df['invitation'].apply(lambda x: '/Decision' in x)]
+        if len(decision_note) == 1:
+            decision = decision_note['content'].iloc[0]['decision']
+            return 'Accept' in decision
+        else:
+            # display(group_df)
+            # display(decision_note)
+            assert False
 
-def ff_author_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
-    return paper_df['content'].apply(lambda x: len(x.get('authors', [])))
-
-
-def ff_keyword_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
-    return paper_df['content'].apply(lambda x: len(x.get('keywords', [])))
-
-
-def ff_is_accepted(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
-    decision_note = nonreview_df[nonreview_df['invitation'].apply(lambda x: '/Decision' in x)]
-    if len(decision_note) == 1:
-        decision = decision_note['content'].iloc[0]['decision']
-        return 'Accept' in decision
-    else:
-        # display(group_df)
-        # display(decision_note)
-        assert False
-
-
-def ff_metareview_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
-    decision_note = nonreview_df[nonreview_df['invitation'].apply(lambda x: '/Meta' in x)]
-    if len(decision_note) == 1:
-        metareview = decision_note['content'].iloc[0]['metareview']
-        return len(metareview)
-    # paper might not have a metareview
-    return None
+    @staticmethod
+    def ff_metareview_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+        decision_note = other_replies_df[other_replies_df['invitation'].apply(lambda x: '/Meta' in x)]
+        if len(decision_note) == 1:
+            metareview = decision_note['content'].iloc[0]['metareview']
+            return len(metareview)
+        # paper might not have a metareview
+        return None
 
 # ----------------------------------
 
 
-
-# TODO: populate the namespace with such functions. 
+# TODO: populate the namespace with such functions.
 # the cartesian product of
 """
         fields = ['confidence', 'correctness', 'technical_novelty_and_significance',
@@ -86,7 +87,8 @@ def ff_metareview_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', no
 
 """
 
-def ff_confidence_nanmean(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', nonreview_df: 'pd.DataFrame'):
+
+def ff_confidence_nanmean(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
     fieldname = 'confidence'
     agg_func = np.nanmean
 
