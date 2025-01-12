@@ -9,7 +9,7 @@ import pandas as pd
 # the inputs are  papers' reviews and nonreviews. you can extract features from them.
 
 """
-def ff_your_feature_name(review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+def ff_<your_feature_name>(review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
     # write your feature calculation here
 
     return 1234  # this will be the value in the feature_df
