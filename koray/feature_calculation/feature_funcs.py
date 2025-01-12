@@ -121,6 +121,11 @@ def reviewer_numeric_agg(review_df: 'pd.DataFrame', fieldname: str, agg_func: ca
     return agg_func(field_values)
 
 
+
+def yusuf_max_diff(arr):
+    return np.max(arr) - np.min(arr)
+
+
 fields = ['confidence', 'correctness', 'technical_novelty_and_significance',
           'empirical_novelty_and_significance', 'recommendation']
 agg_functions = [
@@ -131,6 +136,8 @@ agg_functions = [
     np.nanmin,
     np.nanmax,
     np.nanmedian,
+    # 
+    yusuf_max_diff,
 ]
 
 
