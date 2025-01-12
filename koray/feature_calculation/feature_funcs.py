@@ -8,12 +8,22 @@ import pandas as pd
 # these functions are used to calculate columns in feature df
 # the inputs are  papers' reviews and nonreviews. you can extract features from them.
 
-"""
-def ff_<your_feature_name>(review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+
+def ff_your_feature_name(
+    paper_df: 'pd.DataFrame',  # i'th paper's data
+    review_df: 'pd.DataFrame',  # i'th paper's reviews
+    other_replies_df: 'pd.DataFrame',  # i'th paper's nonreviews
+    master_paper_df: 'pd.DataFrame',  # all papers' data in the conference
+    master_review_df: 'pd.DataFrame',  # all papers' reviews in the conference
+    master_other_replies_df: 'pd.DataFrame',  # all papers' nonreviews in the conference
+):
+    # Note: in the current implementation master_ dataframmes are for 1 conference. 
+    # However, this behavior depends on how FeatureExtractor is used. 
+    
+
     # write your feature calculation here
 
     return 1234  # this will be the value in the feature_df
-"""
 
 # ----------------------------------
 
@@ -34,27 +44,27 @@ def _extract_numeric_prefix(maybe_string: object) -> int:
 
 class FeatureFunctions:
     @staticmethod
-    def ff_title_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+    def ff_title_length(paper_df: 'pd.DataFrame', **kwargs):
         return paper_df['content'].apply(lambda x: len(x.get('title', '')))
 
     @staticmethod
-    def ff_abstract_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+    def ff_abstract_length(paper_df: 'pd.DataFrame', **kwargs):
         return paper_df['content'].apply(lambda x: len(x.get('abstract', '')))
 
     @staticmethod
-    def ff_tldr_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+    def ff_tldr_length(paper_df: 'pd.DataFrame', **kwargs):
         return paper_df['content'].apply(lambda x: len(x.get('TL;DR', '')))
 
     @staticmethod
-    def ff_author_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+    def ff_author_count(paper_df: 'pd.DataFrame', **kwargs):
         return paper_df['content'].apply(lambda x: len(x.get('authors', [])))
 
     @staticmethod
-    def ff_keyword_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+    def ff_keyword_count(paper_df: 'pd.DataFrame', **kwargs):
         return paper_df['content'].apply(lambda x: len(x.get('keywords', [])))
 
     @staticmethod
-    def ff_is_accepted(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+    def ff_is_accepted(other_replies_df: 'pd.DataFrame', **kwargs):
         decision_note = other_replies_df[other_replies_df['invitation'].apply(lambda x: '/Decision' in x)]
         if len(decision_note) == 1:
             decision = decision_note['content'].iloc[0]['decision']
@@ -65,7 +75,7 @@ class FeatureFunctions:
             assert False
 
     @staticmethod
-    def ff_metareview_length(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
+    def ff_metareview_length(other_replies_df: 'pd.DataFrame', **kwargs):
         decision_note = other_replies_df[other_replies_df['invitation'].apply(lambda x: '/Meta' in x)]
         if len(decision_note) == 1:
             metareview = decision_note['content'].iloc[0]['metareview']

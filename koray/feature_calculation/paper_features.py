@@ -37,10 +37,16 @@ class FeatureExtractor:
             paper_id = group['replyto'].values[0]
 
             # create sub dataframes
-            paper_df = self.paper_df[self.paper_df['id'] == paper_id]
             _reviewers = group.signatures.apply(lambda x: any('Reviewer_' in s for s in x))
-            review_df = group[_reviewers]
-            other_replies_df = group[~_reviewers]
+            kwargs = {
+                'paper_df': self.paper_df[self.paper_df['id'] == paper_id],
+                'review_df': group[_reviewers],
+                'other_replies_df': group[~_reviewers],
+                'master_paper_df': self.paper_df,
+                'master_review_df': self.review_df,
+                'master_other_replies_df': self.other_replies_df,
+
+            }
 
             # extract features
             features = {}
@@ -48,8 +54,7 @@ class FeatureExtractor:
                 if func_name.startswith('ff_'):
                     func = getattr(FeatureFunctions, func_name)
                     feature_name = func_name[len("ff_"):]
-
-                    features[feature_name] = func(paper_df, review_df, other_replies_df)
+                    features[feature_name] = func(**kwargs)
 
             return pd.Series(features)
 
