@@ -37,7 +37,11 @@ def _save_papers_to_cache(invitation: str, papers: list['openreview.api.Note']):
     for df in [paper_df, review_df, other_replies_df]:
         for col in df.columns:
             if "date" in col.lower():
-                df[col] = pd.to_datetime(df[col], unit='ms')
+                try:
+                    df[col] = pd.to_datetime(df[col], unit='ms')
+                except Exception as e:
+                    print(df[col])
+                    raise e
 
     # save to cache
     picklefile = get_invitation_path(invitation)

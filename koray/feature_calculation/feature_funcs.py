@@ -17,9 +17,8 @@ def ff_your_feature_name(
     master_review_df: 'pd.DataFrame',  # all papers' reviews in the conference
     master_other_replies_df: 'pd.DataFrame',  # all papers' nonreviews in the conference
 ):
-    # Note: in the current implementation master_ dataframmes are for 1 conference. 
-    # However, this behavior depends on how FeatureExtractor is used. 
-    
+    # Note: in the current implementation master_ dataframmes are for 1 conference.
+    # However, this behavior depends on how FeatureExtractor is used.
 
     # write your feature calculation here
 
@@ -86,27 +85,27 @@ class FeatureFunctions:
 # ----------------------------------
 
 
-# TODO: populate the namespace with such functions.
-# the cartesian product of
-"""
-        fields = ['confidence', 'correctness', 'technical_novelty_and_significance',
-                  'empirical_novelty_and_significance', 'recommendation']
-        agg_functions = [np.nanmean, np.nanstd,
-                         np.nanmin, np.nanmax, np.nanmedian, np.nansum, np.nanvar, np.nanprod
-                         ]
-
-"""
-
-
-def ff_confidence_nanmean(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', other_replies_df: 'pd.DataFrame'):
-    fieldname = 'confidence'
-    agg_func = np.nanmean
-
-    # generic func below
-
+def reviewer_numeric_agg(review_df: 'pd.DataFrame', fieldname: str, agg_func: callable):
     field_values = review_df['content'].apply(lambda x: _extract_numeric_prefix(
         x.get(fieldname)) if isinstance(x, dict) else None)
 
     if field_values.isnull().all():
         return np.nan  # if cannot extract numeric prefix from any value, return NaN
     return agg_func(field_values)
+
+
+fields = ['confidence', 'correctness', 'technical_novelty_and_significance',
+          'empirical_novelty_and_significance', 'recommendation']
+agg_functions = [np.nanmean, np.nanstd,
+                 np.nanmin, np.nanmax, np.nanmedian, np.nansum, np.nanvar, np.nanprod
+                 ]
+
+
+for field in fields:
+    for agg_func in agg_functions:
+        func_name = f'ff_reviewer_{field}_{agg_func.__name__}'
+
+        def func(review_df, field=field, agg_func=agg_func, **kwargs):
+            return reviewer_numeric_agg(review_df, field, agg_func)
+
+        setattr(FeatureFunctions, func_name, staticmethod(func))
