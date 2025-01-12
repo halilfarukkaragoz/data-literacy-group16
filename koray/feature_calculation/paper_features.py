@@ -1,6 +1,8 @@
 
+import inspect
 import warnings
 
+import numpy as np
 import pandas as pd
 
 from koray.feature_calculation.feature_funcs import FeatureFunctions
@@ -13,9 +15,37 @@ try:
     from tqdm.rich import tqdm
 except ImportError:
     import tqdm
-
-
 tqdm.pandas()
+
+
+def extract_overwrite_dtype(func):
+    # Get the source code of the function
+    try:
+        source = inspect.getsource(func)
+    except (OSError, TypeError):
+        return None  # Could not retrieve source
+
+    # Check for assignment to __overwrite_dtype__
+    for line in source.splitlines():
+        line = line.strip()
+        if line.startswith("__overwrite_dtype__"):
+            # Extract the assigned value (e.g., np.float64)
+            parts = line.split("=", 1)
+            if len(parts) == 2:
+                # Return the assigned value as a string
+                return parts[1].strip()
+    return None
+
+
+def get_dtype_safe(dtype_str):
+    # Safe resolution of the dtype from globals() or locals()
+    try:
+        # Attempt to retrieve the dtype object from globals
+        dtype = eval(dtype_str, {"np": np})
+        return dtype
+    except NameError:
+        # If eval fails, return None
+        return None
 
 
 class FeatureExtractor:
@@ -69,5 +99,19 @@ class FeatureExtractor:
         ).groupby('replyto').progress_apply(
             self._extract_features()
         ).reset_index()
-
         self.feature_df = feature_df.rename(columns={'replyto': 'paper_id'})
+        
+        self.overwrite_dtypes()
+
+    def overwrite_dtypes(self):
+        for col in self.feature_df.columns:
+            try:
+                feature_func = getattr(FeatureFunctions, f"ff_{col}")
+            except AttributeError:
+                continue
+
+            dtype_str = extract_overwrite_dtype(feature_func)
+            if dtype_str:
+                dtype = get_dtype_safe(dtype_str)
+                if dtype:
+                    self.feature_df[col] = self.feature_df[col].astype(dtype)

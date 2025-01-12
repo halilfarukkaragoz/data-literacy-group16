@@ -20,7 +20,12 @@ def ff_your_feature_name(
     # Note: in the current implementation master_ dataframmes are for 1 conference.
     # However, this behavior depends on how FeatureExtractor is used.
 
+    # these overwrite the dtype of the feature_df column
+    __overwrite_dtype__ = np.float64
+    __overwrite_dtype__ = np.int64
+
     # write your feature calculation here
+    ...
 
     return 1234  # this will be the value in the feature_df
 
@@ -38,29 +43,49 @@ def _extract_numeric_prefix(maybe_string: object) -> int:
     match = re.match(r'^(\d+)', string.strip())
     return int(match.group(1)) if match else np.nan
 
-# ----------------------------------
 
+def get_field_length(content: dict, field: str, default: int = 0) -> int:
+    """
+    Utility function to calculate the length of a specified field in a dictionary.
+
+    Args:
+        content (dict): The dictionary containing the fields.
+        field (str): The field name to calculate the length for.
+        default (int): The default length to return if the field is missing or empty.
+
+    Returns:
+        int: The length of the specified field, or the default value.
+    """
+    return len(content.get(field, '')) if content.get(field) else default
+
+
+# ----------------------------------
 
 class FeatureFunctions:
     @staticmethod
     def ff_title_length(paper_df: 'pd.DataFrame', **kwargs):
-        return paper_df['content'].apply(lambda x: len(x.get('title', '')))
+        __overwrite_dtype__ = np.float64
+        return paper_df['content'].apply(lambda x: get_field_length(x, 'title'))
 
     @staticmethod
     def ff_abstract_length(paper_df: 'pd.DataFrame', **kwargs):
-        return paper_df['content'].apply(lambda x: len(x.get('abstract', '')))
+        __overwrite_dtype__ = np.float64
+        return paper_df['content'].apply(lambda x: get_field_length(x, 'abstract'))
 
     @staticmethod
     def ff_tldr_length(paper_df: 'pd.DataFrame', **kwargs):
-        return paper_df['content'].apply(lambda x: len(x.get('TL;DR', '')))
+        __overwrite_dtype__ = np.float64
+        return paper_df['content'].apply(lambda x: get_field_length(x, 'TL;DR'))
 
     @staticmethod
     def ff_author_count(paper_df: 'pd.DataFrame', **kwargs):
-        return paper_df['content'].apply(lambda x: len(x.get('authors', [])))
+        __overwrite_dtype__ = np.float64
+        return paper_df['content'].apply(lambda x: get_field_length(x, 'authors'))
 
     @staticmethod
     def ff_keyword_count(paper_df: 'pd.DataFrame', **kwargs):
-        return paper_df['content'].apply(lambda x: len(x.get('keywords', [])))
+        __overwrite_dtype__ = np.float64
+        return paper_df['content'].apply(lambda x: get_field_length(x, 'keywords'))
 
     @staticmethod
     def ff_is_accepted(other_replies_df: 'pd.DataFrame', **kwargs):
@@ -75,12 +100,13 @@ class FeatureFunctions:
 
     @staticmethod
     def ff_metareview_length(other_replies_df: 'pd.DataFrame', **kwargs):
+        __overwrite_dtype__ = np.float64
         decision_note = other_replies_df[other_replies_df['invitation'].apply(lambda x: '/Meta' in x)]
         if len(decision_note) == 1:
             metareview = decision_note['content'].iloc[0]['metareview']
             return len(metareview)
         # paper might not have a metareview
-        return None
+        return np.nan
 
 # ----------------------------------
 
@@ -96,9 +122,15 @@ def reviewer_numeric_agg(review_df: 'pd.DataFrame', fieldname: str, agg_func: ca
 
 fields = ['confidence', 'correctness', 'technical_novelty_and_significance',
           'empirical_novelty_and_significance', 'recommendation']
-agg_functions = [np.nanmean, np.nanstd,
-                 np.nanmin, np.nanmax, np.nanmedian, np.nansum, np.nanvar, np.nanprod
-                 ]
+agg_functions = [
+    np.nanmean,
+    np.nanvar,
+    np.nanstd,
+    #
+    np.nanmin,
+    np.nanmax,
+    np.nanmedian,
+]
 
 
 for field in fields:
