@@ -109,6 +109,7 @@ class FeatureFunctions:
         return np.nan
 
 # ----------------------------------
+# extending the FeatureFunctions class with numeric functions for reviewer fields
 
 
 def reviewer_numeric_agg(review_df: 'pd.DataFrame', fieldname: str, agg_func: callable):
