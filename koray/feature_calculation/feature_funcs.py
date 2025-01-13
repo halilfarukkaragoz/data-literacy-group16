@@ -108,6 +108,11 @@ class FeatureFunctions:
         # paper might not have a metareview
         return np.nan
 
+    @staticmethod
+    def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
+        __overwrite_dtype__ = np.float64
+        return len(review_df)
+
 # ----------------------------------
 # extending the FeatureFunctions class with numeric functions for reviewer fields
 
@@ -119,7 +124,6 @@ def reviewer_numeric_agg(review_df: 'pd.DataFrame', fieldname: str, agg_func: ca
     if field_values.isnull().all():
         return np.nan  # if cannot extract numeric prefix from any value, return NaN
     return agg_func(field_values)
-
 
 
 def yusuf_max_diff(arr):
@@ -136,7 +140,7 @@ agg_functions = [
     np.nanmin,
     np.nanmax,
     np.nanmedian,
-    # 
+    #
     yusuf_max_diff,
 ]
 

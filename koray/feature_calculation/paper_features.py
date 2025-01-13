@@ -7,14 +7,19 @@ import pandas as pd
 
 from koray.feature_calculation.feature_funcs import FeatureFunctions
 
+FINAL_BUILD = True
 try:
+    if FINAL_BUILD:
+        # bad style I know but this is needed.
+        raise ImportError
     from tqdm import TqdmExperimentalWarning
 
     # Remove experimental warning
     warnings.filterwarnings("ignore", category=TqdmExperimentalWarning)
     from tqdm.rich import tqdm
 except ImportError:
-    import tqdm
+    from tqdm import tqdm
+
 tqdm.pandas()
 
 
@@ -49,12 +54,20 @@ def get_dtype_safe(dtype_str):
 
 
 class FeatureExtractor:
-    def __init__(self, paper_df: pd.DataFrame, review_df: pd.DataFrame, other_replies_df: pd.DataFrame):
+    def __init__(
+            self,
+            paper_df: pd.DataFrame,
+            review_df: pd.DataFrame,
+            other_replies_df: pd.DataFrame,
+            featurefunctions: FeatureFunctions = FeatureFunctions,
+    ):
         self.paper_df = paper_df
         self.review_df = review_df
         self.other_replies_df = other_replies_df
 
         self.feature_df = self.get_base_feature_df()
+
+        self.featurefunctions = featurefunctions
 
     def get_base_feature_df(self):
         feature_df = self.paper_df.iloc[:, [0]].copy()
@@ -80,9 +93,9 @@ class FeatureExtractor:
 
             # extract features
             features = {}
-            for func_name in dir(FeatureFunctions):
+            for func_name in dir(self.featurefunctions):
                 if func_name.startswith('ff_'):
-                    func = getattr(FeatureFunctions, func_name)
+                    func = getattr(self.featurefunctions, func_name)
                     feature_name = func_name[len("ff_"):]
                     features[feature_name] = func(**kwargs)
 
@@ -99,14 +112,15 @@ class FeatureExtractor:
         ).groupby('replyto').progress_apply(
             self._extract_features()
         ).reset_index()
+
         self.feature_df = feature_df.rename(columns={'replyto': 'paper_id'})
-        
+
         self.overwrite_dtypes()
 
     def overwrite_dtypes(self):
         for col in self.feature_df.columns:
             try:
-                feature_func = getattr(FeatureFunctions, f"ff_{col}")
+                feature_func = getattr(self.featurefunctions, f"ff_{col}")
             except AttributeError:
                 continue
 
