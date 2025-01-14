@@ -119,6 +119,10 @@ class FeatureFunctions:
         return int(invitation.split("/")[1])
 
     @staticmethod
+    def ff_web_url(paper_df: 'pd.DataFrame', **kwargs):
+        return f"https://openreview.net/forum?id={paper_df.iloc[0]['id']}"
+
+    @staticmethod
     def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
         __overwrite_dtype__ = np.int64
         return len(review_df)
@@ -145,8 +149,32 @@ def reviewer_numeric_agg(review_df: 'pd.DataFrame', fieldname: str, agg_func: ca
     return agg_func(field_values)
 
 
-def yusuf_max_diff(arr):
-    return np.max(arr) - np.min(arr)
+def yusuf_max_diff(series: 'pd.Series'):
+    return np.max(series) - np.min(series)
+
+
+def list_agg(series: 'pd.Series'):
+    return series.tolist()
+
+
+def unique_value_frequency(series: 'pd.Series'):
+    return series.value_counts()
+
+
+def num_unique_values(series: 'pd.Series'):
+    return len(series.unique())
+
+
+def var_to_mean_ratio(series: 'pd.Series'):
+    return series.var() / series.mean()
+
+
+def mean_absolute_deviation(series: 'pd.Series'):
+    return (series - series.mean()).abs().mean()
+
+
+def coefficient_of_variation(series: 'pd.Series'):
+    return series.std() / series.mean()
 
 
 fields = ['confidence', 'correctness', 'technical_novelty_and_significance',
@@ -161,6 +189,12 @@ agg_functions = [
     np.nanmedian,
     #
     yusuf_max_diff,
+    list_agg,
+    unique_value_frequency,
+    num_unique_values,
+    var_to_mean_ratio,
+    mean_absolute_deviation,
+    coefficient_of_variation,
 ]
 
 
