@@ -120,7 +120,7 @@ class FeatureFunctions:
 
     @staticmethod
     def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
-        __overwrite_dtype__ = np.float64
+        __overwrite_dtype__ = np.int64
         return len(review_df)
 
 # ----------------------------------
