@@ -148,6 +148,26 @@ def list_agg(series: 'pd.Series'):
     return series.tolist()
 
 
+def unique_value_frequency(series: 'pd.Series'):
+    return series.value_counts()
+
+
+def num_unique_values(series: 'pd.Series'):
+    return len(series.unique())
+
+
+def var_to_mean_ratio(series: 'pd.Series'):
+    return series.var() / series.mean()
+
+
+def mean_absolute_deviation(series: 'pd.Series'):
+    return (series - series.mean()).abs().mean()
+
+
+def coefficient_of_variation(series: 'pd.Series'):
+    return series.std() / series.mean()
+
+
 fields = ['confidence', 'correctness', 'technical_novelty_and_significance',
           'empirical_novelty_and_significance', 'recommendation']
 agg_functions = [
@@ -161,6 +181,11 @@ agg_functions = [
     #
     yusuf_max_diff,
     list_agg,
+    unique_value_frequency,
+    num_unique_values,
+    var_to_mean_ratio,
+    mean_absolute_deviation,
+    coefficient_of_variation,
 ]
 
 
