@@ -119,6 +119,10 @@ class FeatureFunctions:
         return int(invitation.split("/")[1])
 
     @staticmethod
+    def ff_web_url(paper_df: 'pd.DataFrame', **kwargs):
+        return f"https://openreview.net/forum?id={paper_df.iloc[0]['id']}"
+
+    @staticmethod
     def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
         __overwrite_dtype__ = np.int64
         return len(review_df)
