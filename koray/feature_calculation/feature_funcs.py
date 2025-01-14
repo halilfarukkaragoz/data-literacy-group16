@@ -109,6 +109,16 @@ class FeatureFunctions:
         return np.nan
 
     @staticmethod
+    def ff_conference_name(paper_df: 'pd.DataFrame', **kwargs):
+        invitation = paper_df['invitation'].iloc[0]
+        return invitation.split("/")[0]
+
+    @staticmethod
+    def ff_conference_year(paper_df: 'pd.DataFrame', **kwargs):
+        invitation = paper_df['invitation'].iloc[0]
+        return int(invitation.split("/")[1])
+
+    @staticmethod
     def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
         __overwrite_dtype__ = np.float64
         return len(review_df)
