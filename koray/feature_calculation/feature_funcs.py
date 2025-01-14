@@ -122,16 +122,7 @@ class FeatureFunctions:
     def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
         __overwrite_dtype__ = np.int64
         return len(review_df)
-    
-    @staticmethod
-    def ff_individual_confidence_scores(review_df: 'pd.DataFrame', **kwargs):
-        confidence_scores = list(review_df['content'].apply(lambda x: _extract_numeric_prefix(x.get('confidence'))))
-        return confidence_scores
-     
-    @staticmethod
-    def ff_individual_recommendation_scores(review_df: 'pd.DataFrame', **kwargs):
-        recommendation_scores = list(review_df['content'].apply(lambda x: _extract_numeric_prefix(x.get('recommendation'))))
-        return recommendation_scores
+
 # ----------------------------------
 # extending the FeatureFunctions class with numeric functions for reviewer fields
 
