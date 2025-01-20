@@ -3,6 +3,9 @@ import re
 
 import numpy as np
 import pandas as pd
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+analyzer = SentimentIntensityAnalyzer()
 
 # ff_ is short for feature_function and the prefix is necessary for the feature_extractor.py to find the function
 # these functions are used to calculate columns in feature df
@@ -136,6 +139,57 @@ class FeatureFunctions:
     def ff_individual_recommendation_scores(review_df: 'pd.DataFrame', **kwargs):
         recommendation_scores = list(review_df['content'].apply(lambda x: _extract_numeric_prefix(x.get('recommendation'))))
         return recommendation_scores
+    
+    @staticmethod
+    def ff_sentiment_analysis_scores(review_df: 'pd.DataFrame', **kwargs):
+        reviews = list(review_df['content'])
+        sentiment_scores = [analyzer.polarity_scores(str(review)) for review in reviews]
+        
+        return sentiment_scores
+
+    @staticmethod
+    def ff_sentiment_analysis_score_negative_mean(review_df: 'pd.DataFrame', **kwargs):
+        # this is slow but works for now.
+        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+        negative_scores = [score['neg'] for score in sentiment_scores]
+        return np.mean(negative_scores)
+
+    @staticmethod
+    def ff_sentiment_analysis_score_neutral_mean(review_df: 'pd.DataFrame', **kwargs):
+        # this is slow but works for now.
+        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+        neutral_scores = [score['neu'] for score in sentiment_scores]
+        return np.mean(neutral_scores)
+
+    @staticmethod
+    def ff_sentiment_analysis_score_positive_mean(review_df: 'pd.DataFrame', **kwargs):
+        # this is slow but works for now.
+        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+        positive_scores = [score['pos'] for score in sentiment_scores]
+        return np.mean(positive_scores)
+    
+    @staticmethod
+    def ff_sentiment_analysis_score_negative_var(review_df: 'pd.DataFrame', **kwargs):
+        # this is slow but works for now.
+        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+        negative_scores = [score['neg'] for score in sentiment_scores]
+        return np.var(negative_scores)
+
+    @staticmethod
+    def ff_sentiment_analysis_score_neutral_var(review_df: 'pd.DataFrame', **kwargs):
+        # this is slow but works for now.
+        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+        neutral_scores = [score['neu'] for score in sentiment_scores]
+        return np.var(neutral_scores)
+
+    @staticmethod
+    def ff_sentiment_analysis_score_positive_var(review_df: 'pd.DataFrame', **kwargs):
+        # this is slow but works for now.
+        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+        positive_scores = [score['pos'] for score in sentiment_scores]
+        return np.var(positive_scores)
+
+
 # ----------------------------------
 # extending the FeatureFunctions class with numeric functions for reviewer fields
 
