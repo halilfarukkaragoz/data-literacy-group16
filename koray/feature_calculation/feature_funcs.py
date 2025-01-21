@@ -145,6 +145,12 @@ class FeatureFunctions:
         area = paper_df.iloc[0]['content'].get('Please_choose_the_closest_area_that_your_submission_falls_into', '')
         return area
     
+    @staticmethod
+    def ff_keywords(paper_df: 'pd.DataFrame', **kwargs):
+        area = paper_df.iloc[0]['content'].get('keywords', '')
+        return area
+
+    
 
     # @staticmethod
     # def ff_sentiment_analysis_scores(review_df: 'pd.DataFrame', **kwargs):
