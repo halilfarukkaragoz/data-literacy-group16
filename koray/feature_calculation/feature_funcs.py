@@ -101,15 +101,15 @@ class FeatureFunctions:
             # display(decision_note)
             assert False
 
-    @staticmethod
-    def ff_metareview_length(other_replies_df: 'pd.DataFrame', **kwargs):
-        __overwrite_dtype__ = np.float64
-        decision_note = other_replies_df[other_replies_df['invitation'].apply(lambda x: '/Meta' in x)]
-        if len(decision_note) == 1:
-            metareview = decision_note['content'].iloc[0]['metareview']
-            return len(metareview)
-        # paper might not have a metareview
-        return np.nan
+    # @staticmethod
+    # def ff_metareview_length(other_replies_df: 'pd.DataFrame', **kwargs):
+    #     __overwrite_dtype__ = np.float64
+    #     decision_note = other_replies_df[other_replies_df['invitation'].apply(lambda x: '/Meta' in x)]
+    #     if len(decision_note) == 1:
+    #         metareview = decision_note['content'].iloc[0]['metareview']
+    #         return len(metareview)
+    #     # paper might not have a metareview
+    #     return np.nan
 
     @staticmethod
     def ff_conference_name(paper_df: 'pd.DataFrame', **kwargs):
@@ -127,7 +127,7 @@ class FeatureFunctions:
 
     @staticmethod
     def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
-        __overwrite_dtype__ = np.int64
+        __overwrite_dtype__ = np.int32
         return len(review_df)
     
     @staticmethod
@@ -139,55 +139,55 @@ class FeatureFunctions:
     def ff_individual_recommendation_scores(review_df: 'pd.DataFrame', **kwargs):
         recommendation_scores = list(review_df['content'].apply(lambda x: _extract_numeric_prefix(x.get('recommendation'))))
         return recommendation_scores
-    
-    @staticmethod
-    def ff_sentiment_analysis_scores(review_df: 'pd.DataFrame', **kwargs):
-        reviews = list(review_df['content'])
-        sentiment_scores = [analyzer.polarity_scores(str(review)) for review in reviews]
+
+    # @staticmethod
+    # def ff_sentiment_analysis_scores(review_df: 'pd.DataFrame', **kwargs):
+    #     reviews = list(review_df['content'])
+    #     sentiment_scores = [analyzer.polarity_scores(str(review)) for review in reviews]
         
-        return sentiment_scores
+    #     return sentiment_scores
 
-    @staticmethod
-    def ff_sentiment_analysis_score_negative_mean(review_df: 'pd.DataFrame', **kwargs):
-        # this is slow but works for now.
-        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
-        negative_scores = [score['neg'] for score in sentiment_scores]
-        return np.mean(negative_scores)
+    # @staticmethod
+    # def ff_sentiment_analysis_score_negative_mean(review_df: 'pd.DataFrame', **kwargs):
+    #     # this is slow but works for now.
+    #     sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+    #     negative_scores = [score['neg'] for score in sentiment_scores]
+    #     return np.mean(negative_scores)
 
-    @staticmethod
-    def ff_sentiment_analysis_score_neutral_mean(review_df: 'pd.DataFrame', **kwargs):
-        # this is slow but works for now.
-        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
-        neutral_scores = [score['neu'] for score in sentiment_scores]
-        return np.mean(neutral_scores)
+    # @staticmethod
+    # def ff_sentiment_analysis_score_neutral_mean(review_df: 'pd.DataFrame', **kwargs):
+    #     # this is slow but works for now.
+    #     sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+    #     neutral_scores = [score['neu'] for score in sentiment_scores]
+    #     return np.mean(neutral_scores)
 
-    @staticmethod
-    def ff_sentiment_analysis_score_positive_mean(review_df: 'pd.DataFrame', **kwargs):
-        # this is slow but works for now.
-        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
-        positive_scores = [score['pos'] for score in sentiment_scores]
-        return np.mean(positive_scores)
+    # @staticmethod
+    # def ff_sentiment_analysis_score_positive_mean(review_df: 'pd.DataFrame', **kwargs):
+    #     # this is slow but works for now.
+    #     sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+    #     positive_scores = [score['pos'] for score in sentiment_scores]
+    #     return np.mean(positive_scores)
     
-    @staticmethod
-    def ff_sentiment_analysis_score_negative_var(review_df: 'pd.DataFrame', **kwargs):
-        # this is slow but works for now.
-        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
-        negative_scores = [score['neg'] for score in sentiment_scores]
-        return np.var(negative_scores)
+    # @staticmethod
+    # def ff_sentiment_analysis_score_negative_var(review_df: 'pd.DataFrame', **kwargs):
+    #     # this is slow but works for now.
+    #     sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+    #     negative_scores = [score['neg'] for score in sentiment_scores]
+    #     return np.var(negative_scores)
 
-    @staticmethod
-    def ff_sentiment_analysis_score_neutral_var(review_df: 'pd.DataFrame', **kwargs):
-        # this is slow but works for now.
-        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
-        neutral_scores = [score['neu'] for score in sentiment_scores]
-        return np.var(neutral_scores)
+    # @staticmethod
+    # def ff_sentiment_analysis_score_neutral_var(review_df: 'pd.DataFrame', **kwargs):
+    #     # this is slow but works for now.
+    #     sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+    #     neutral_scores = [score['neu'] for score in sentiment_scores]
+    #     return np.var(neutral_scores)
 
-    @staticmethod
-    def ff_sentiment_analysis_score_positive_var(review_df: 'pd.DataFrame', **kwargs):
-        # this is slow but works for now.
-        sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
-        positive_scores = [score['pos'] for score in sentiment_scores]
-        return np.var(positive_scores)
+    # @staticmethod
+    # def ff_sentiment_analysis_score_positive_var(review_df: 'pd.DataFrame', **kwargs):
+    #     # this is slow but works for now.
+    #     sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
+    #     positive_scores = [score['pos'] for score in sentiment_scores]
+    #     return np.var(positive_scores)
 
 
 # ----------------------------------
