@@ -140,6 +140,12 @@ class FeatureFunctions:
         recommendation_scores = list(review_df['content'].apply(lambda x: _extract_numeric_prefix(x.get('recommendation'))))
         return recommendation_scores
 
+    @staticmethod
+    def ff_paper_area(paper_df: 'pd.DataFrame', **kwargs):
+        area = paper_df.iloc[0]['content'].get('Please_choose_the_closest_area_that_your_submission_falls_into', '')
+        return area
+    
+
     # @staticmethod
     # def ff_sentiment_analysis_scores(review_df: 'pd.DataFrame', **kwargs):
     #     reviews = list(review_df['content'])
