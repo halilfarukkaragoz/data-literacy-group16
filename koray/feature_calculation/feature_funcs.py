@@ -192,6 +192,33 @@ class FeatureFunctions:
         deadline_delta = pd.to_datetime('2022-11-05 01:00:00') - review_df['cdate']
         return deadline_delta.mean().days
 
+    @staticmethod
+    def ff_citation_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
+        __overwrite_dtype__ = np.float64
+
+        def _get_citations():
+            citation_dict = {}
+            try:
+                filename = "/Users/koray/data-literacy-group16/halil/citations.txt"
+                with open(filename, "r", encoding="utf-8") as file:
+                    for line in file:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        # Each line should be in the format 'title: count'
+                        parts = line.rsplit(":", 1)
+                        if len(parts) == 2:
+                            title_part, count_part = parts[0].strip(), parts[1].strip()
+                            # In case titles themselves contain ':', we used rsplit above
+                            citation_dict[title_part] = int(count_part)
+            except FileNotFoundError:
+                raise "halil/citations.txt not found. please make sure the path in this function is correct"
+            return citation_dict
+
+        citations = _get_citations()
+
+        return citations.get(paper_df.iloc[0]['content']['title'], 0)
+
     # @staticmethod
     # def ff_sentiment_analysis_scores(review_df: 'pd.DataFrame', **kwargs):
     #     reviews = list(review_df['content'])
