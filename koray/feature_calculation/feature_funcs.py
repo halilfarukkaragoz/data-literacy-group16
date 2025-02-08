@@ -1,5 +1,5 @@
-
 import re
+from collections import Counter
 
 import numpy as np
 import pandas as pd
@@ -129,34 +129,74 @@ class FeatureFunctions:
     def ff_review_count(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
         __overwrite_dtype__ = np.int32
         return len(review_df)
-    
+
     @staticmethod
     def ff_individual_confidence_scores(review_df: 'pd.DataFrame', **kwargs):
         confidence_scores = list(review_df['content'].apply(lambda x: _extract_numeric_prefix(x.get('confidence'))))
         return confidence_scores
-     
+
     @staticmethod
     def ff_individual_recommendation_scores(review_df: 'pd.DataFrame', **kwargs):
-        recommendation_scores = list(review_df['content'].apply(lambda x: _extract_numeric_prefix(x.get('recommendation'))))
+        recommendation_scores = list(review_df['content'].apply(
+            lambda x: _extract_numeric_prefix(x.get('recommendation'))))
         return recommendation_scores
 
     @staticmethod
     def ff_paper_area(paper_df: 'pd.DataFrame', **kwargs):
         area = paper_df.iloc[0]['content'].get('Please_choose_the_closest_area_that_your_submission_falls_into', '')
         return area
-    
+
     @staticmethod
     def ff_keywords(paper_df: 'pd.DataFrame', **kwargs):
-        area = paper_df.iloc[0]['content'].get('keywords', '')
-        return area
+        keywords = paper_df.iloc[0]['content'].get('keywords', '')
+        return keywords
 
-    
+    @staticmethod
+    def ff_is_high_discrepancy(review_df: 'pd.DataFrame', **kwargs):
+        recommendation_scores = list(review_df['content'].apply(
+            lambda x: _extract_numeric_prefix(x.get('recommendation'))))
+
+        discrepancy = max(recommendation_scores) - min(recommendation_scores)
+        return discrepancy >= 4
+
+    @staticmethod
+    def ff_paper_topic_salience(paper_df: 'pd.DataFrame', master_paper_df: 'pd.DataFrame', **kwargs):
+        def _normalize_keywords(df:  'pd.DataFrame'):
+            # paper keywords
+            keywords = df['content'].apply(lambda x: x.get('keywords', ''))
+            keywords = list(keywords)
+            keywords = [kw.lower().split(" ") for item in keywords for kw in item]
+            keywords = [item.strip() for sublist in keywords for item in sublist]
+            keywords = [kw for kw in keywords if kw not in ['', 'learning', 'deep', 'neural',
+                                                            'networks', 'network', 'model', 'models', 'data', 'machine', 'generation', 'vision']]
+            return keywords
+
+        paper_kw = _normalize_keywords(paper_df)
+        all_paper_kw = _normalize_keywords(master_paper_df)  # not optimal but works
+        freq_counter = Counter(all_paper_kw)
+
+        return sum(freq_counter[k] for k in paper_kw)
+
+    @staticmethod
+    def ff_time_to_deadline_list_agg(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
+        deadline_delta = pd.to_datetime('2022-11-05 01:00:00') - review_df['cdate']
+        return list(deadline_delta)
+
+    @staticmethod
+    def ff_time_to_deadline_mean_seconds(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
+        deadline_delta = pd.to_datetime('2022-11-05 01:00:00') - review_df['cdate']
+        return deadline_delta.mean().total_seconds()
+
+    @staticmethod
+    def ff_time_to_deadline_mean_days(paper_df: 'pd.DataFrame', review_df: 'pd.DataFrame', **kwargs):
+        deadline_delta = pd.to_datetime('2022-11-05 01:00:00') - review_df['cdate']
+        return deadline_delta.mean().days
 
     # @staticmethod
     # def ff_sentiment_analysis_scores(review_df: 'pd.DataFrame', **kwargs):
     #     reviews = list(review_df['content'])
     #     sentiment_scores = [analyzer.polarity_scores(str(review)) for review in reviews]
-        
+
     #     return sentiment_scores
 
     # @staticmethod
@@ -179,7 +219,7 @@ class FeatureFunctions:
     #     sentiment_scores = FeatureFunctions.ff_sentiment_analysis_scores(review_df, **kwargs)
     #     positive_scores = [score['pos'] for score in sentiment_scores]
     #     return np.mean(positive_scores)
-    
+
     # @staticmethod
     # def ff_sentiment_analysis_score_negative_var(review_df: 'pd.DataFrame', **kwargs):
     #     # this is slow but works for now.
