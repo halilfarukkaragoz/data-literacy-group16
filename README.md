@@ -18,7 +18,7 @@ The peer-review process in major machine learning conferences has long been scru
 |`- koray/                 
 |   |`- datastore/        
 |   |`- feature_calculation/ # feature calculations
-|    `- notebooks/            # correlation analysis 
+|    `- notebooks/           # correlation analysis 
 |    
 |`- data/                    # legacy datastore
 |`- data_analysis/           # initial feature analysis
