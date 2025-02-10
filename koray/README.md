@@ -1,6 +1,12 @@
 # Data pipelines
 
 
+Data pipelines uses cache to minimize api request and also caches to save calculated features. Caches can be disabled. See notebooks for usage. 
+
+Caches saved in `.cache` folder. 
+
+## Installation
+
 install using python virtual env
 
 ```
@@ -15,11 +21,11 @@ python -m koray.scripts.get-features
 
 ---
  
-## calculating features 
+## Calculating Features 
 
 you can add new features in `feature_calculation/feature_funcs.py`. remember to delete delete cache if you want to see the new features. 
 
 
-## visualization
+## Visualization
 
 see `notebooks/`
