@@ -12,18 +12,18 @@ The peer-review process in major machine learning conferences has long been scru
 ## Repo Organization
 
 ```sh
-├── busra/                   # time to review deadline analysis
-├── halil/                   # popularity and citation effect analysis
-├── yusuf/                   # discrepancy analysis
-├── koray/                 
-│   ├── datastore/        
-│   ├── feature_calculation/ # feature calculations
-│   `── notebooks/           # correlation analysis 
+|`- busra/                   # time to review deadline analysis
+|`- halil/                   # popularity and citation effect analysis
+|`- yusuf/                   # discrepancy analysis
+|`- koray/                 
+|   |`- datastore/        
+|   |`- feature_calculation/ # feature calculations
+|   `- notebooks/            # correlation analysis 
 |    
-├── data/                    # legacy datastore
-├── data_analysis/           # initial feature analysis
+|`- data/                    # legacy datastore
+|`- data_analysis/           # initial feature analysis
 |
-`── datalit_project_report.pdf  # Paper
+`- datalit_project_report.pdf  # Paper
 ```
 
 
